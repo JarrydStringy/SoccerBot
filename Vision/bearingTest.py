@@ -56,13 +56,13 @@ def bearing(image):
         c = max(contours, key=cv2.contourArea)
 
         marker = cv2.minAreaRect(c)
-        angle = bearing_to_camera(marker[1][0], DEG_PER_PX)
+        bearing = bearing_to_camera(marker[1][0], DEG_PER_PX)
         print("Angle to Ball: " + str(bearing))
 
         box = cv2.cv.BoxPoints(marker) if imutils.is_cv2() else cv2.boxPoints(marker)
         box = np.int0(box)
 
-        cv2.putText(frame, "%.2fdeg" % angle,
+        cv2.putText(frame, "%.2fdeg" % bearing,
                     (frame.shape[1] - 135, frame.shape[0] - 40), cv2.FONT_HERSHEY_SIMPLEX,
                     1, (0, 255, 0), 2)
 
