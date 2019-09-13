@@ -56,7 +56,7 @@ def bearing(image):
         c = max(contours, key=cv2.contourArea)
 
         marker = cv2.minAreaRect(c)
-        angle = bearing_to_camera(marker[1][0], DEG_PER_PX)
+        angle = bearing_to_camera(marker[0][1], DEG_PER_PX)
         print("Angle to Ball: " + str(bearing))
 
         box = cv2.cv.BoxPoints(marker) if imutils.is_cv2() else cv2.boxPoints(marker)
@@ -94,8 +94,8 @@ while True:
     cv2.imshow('frame', frame)
     # cv2.imshow('blur', blur)
     # cv2.imshow('individual mask', ball_mask)
-    # cv2.imshow('masked', masked)
-    # cv2.imshow('edged', edged)
+    cv2.imshow('masked', masked)
+    cv2.imshow('edged', edged)
 
     k = cv2.waitKey(5) & 0xFF
     # k == 27 is for Esc key
