@@ -27,22 +27,27 @@ def distance_to_camera(knownWidth, focalLength, perWidth):
 
 
 # initialize the known distance from the camera to the object(m)
-KNOWN_DISTANCE = 0.5
+KNOWN_DISTANCE = 0.6
 
 # initialize the known object width (m)
 KNOWN_WIDTH = 0.043
 
+lower_ball = np.array([0, 122, 91])
+upper_ball = np.array([255, 250, 255])
+
 # load the first image that contains an object, then find the
 # ball marker in the image, and initialize the focal length
-image = cv2.imread("test.png")
-marker = find_marker(image)
+image = cv2.imread("distTest30.png")
+blur = cv2.GaussianBlur(image, (5, 5), 0)
+hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
+# Threshold the HSV image and erode to create clear mask
+ball_mask = cv2.inRange(hsv, lower_ball, upper_ball)
+ball_mask = cv2.erode(ball_mask, None, iterations=2)
+masked = cv2.bitwise_and(image, image, mask=ball_mask)
+marker = find_marker(masked)
 focalLength = (marker[1][0] * KNOWN_DISTANCE) / KNOWN_WIDTH
 print("Focal length: " + str(focalLength))
 
-# load the image, find the marker in the image, then compute the
-# distance to the marker from the camera
-image = cv2.imread("test.png")
-marker = find_marker(image)
 mm = distance_to_camera(KNOWN_WIDTH, focalLength, marker[1][0])
 
 # draw a bounding box around the image and display it

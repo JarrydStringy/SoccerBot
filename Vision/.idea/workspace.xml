@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="59360800-a6dd-4351-833c-4ba0b36c76e3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ballValues.py" beforeDir="false" afterPath="$PROJECT_DIR$/ballValues.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/distanceTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/distanceTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -28,7 +31,7 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
@@ -158,8 +161,8 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.ballValues" />
-        <item itemvalue="Python.bearingTest" />
         <item itemvalue="Python.distanceTest" />
+        <item itemvalue="Python.bearingTest" />
         <item itemvalue="Python.vision" />
         <item itemvalue="Python.visionTest" />
       </list>

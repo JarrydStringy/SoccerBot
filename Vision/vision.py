@@ -19,6 +19,8 @@ import argparse
 # Ball=============================================
 lower_ball = np.array([0, 122, 91])
 upper_ball = np.array([255, 250, 255])
+# lower_ball = np.array([0, 135, 150])
+# upper_ball = np.array([255, 250, 255])
 # Blue goal========================================
 lower_blue = np.array([115, 59, 34])
 upper_blue = np.array([152, 161, 136])
@@ -28,6 +30,14 @@ upper_yellow = np.array([30, 255, 193])
 # Obstacles========================================
 lower_obstacle = np.array([249, 53, 0])
 upper_obstacle = np.array([50, 160, 82])
+
+
+# Kate ball
+# lower_ball = np.array([0, 25, 0])
+# upper_ball = np.array([15, 255, 255])
+# Kate obstacle
+# lower_obstacle = np.array([0, 0, 0])
+# upper_obstacle = np.array([180, 110, 54])
 
 pts = deque()
 
