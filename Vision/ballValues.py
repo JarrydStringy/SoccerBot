@@ -12,7 +12,7 @@ lower_obstacle = np.array([0, 0, 0])
 upper_obstacle = np.array([180, 110, 54])
 
 BALL_WIDTH = 0.043  # m
-OBSTACLE_WIDTH = 0.1    # m=================================================================
+OBSTACLE_WIDTH = 0.18    # m
 FOCAL_LENGTH = 123.423  # m
 DEG_PER_PX = 0.0192
 
@@ -122,7 +122,7 @@ while True:
     # capture each frame
     ret, frame = cap.read()
     # Flip image
-    frame = cv2.flip(frame, 0)
+    # frame = cv2.flip(frame, 0)
     # blur frames with gaussian 5x5 kernel and determined std dev
     blur = cv2.GaussianBlur(frame, (5, 5), 0)
     # Convert BGR to HSV
@@ -167,8 +167,8 @@ while True:
     # cv2.imshow('blur', blur)
     # cv2.imshow('individual ball mask', ball_mask)
     # cv2.imshow('individual obstacle mask', obstacle_mask)
-    cv2.imshow('masked ball', masked_ball)
-    cv2.imshow('masked obstacle', masked_obstacle)
+    # cv2.imshow('masked ball', masked_ball)
+    # cv2.imshow('masked obstacle', masked_obstacle)
     # cv2.imshow('edged ball', edged_ball)
     # cv2.imshow('edged obstacle', edged_obstacle)
 
