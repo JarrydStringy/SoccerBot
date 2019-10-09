@@ -36,7 +36,7 @@ YELLOW_GOAL_WIDTH = 0  # m
 BLUE_GOAL_WIDTH = 0  # m
 WALL_WIDTH = 0  # m
 FOCAL_LENGTH = 123.423  # m
-DEG_PER_PX = 0.0192  # Calculated constant
+DEG_PER_PX = 0.01927    # Calculated constant
 
 # Begin video capture
 cap = cv2.VideoCapture(0)  # Connect to camera 0 (or the only camera)
