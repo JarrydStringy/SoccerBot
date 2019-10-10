@@ -27,16 +27,16 @@ pwm2 = GPIO.PWM(Motor2E, 100)
 Running = True
 
 while Running:  # making a loop
-    pwm1.start(95)  # starting it with 80% dutycycle
-    pwm2.start(95)
+    pwm1.start(100)  # starting it with 80% dutycycle
+    pwm2.start(100)
     print("Fast")
 
     GPIO.output(Motor1A, GPIO.LOW)
     GPIO.output(Motor1B, GPIO.HIGH)
     GPIO.output(Motor1E, GPIO.HIGH)
 
-    GPIO.output(Motor2A, GPIO.HIGH)
-    GPIO.output(Motor2B, GPIO.LOW)
+    GPIO.output(Motor2A, GPIO.LOW)
+    GPIO.output(Motor2B, GPIO.HIGH)
     GPIO.output(Motor2E, GPIO.HIGH)
 
     time.sleep(5)
@@ -49,11 +49,11 @@ while Running:  # making a loop
     GPIO.output(Motor1B, GPIO.HIGH)
     GPIO.output(Motor1E, GPIO.HIGH)
 
-    GPIO.output(Motor2A, GPIO.HIGH)
-    GPIO.output(Motor2B, GPIO.LOW)
+    GPIO.output(Motor2A, GPIO.LOW)
+    GPIO.output(Motor2B, GPIO.HIGH)
     GPIO.output(Motor2E, GPIO.HIGH)
 
-    time.sleep(5)
+    time.sleep(10)
 
     # pwm1.ChangeDutyCycle(15) # starting it with 25% dutycycle
     # pwm2.ChangeDutyCycle(15)
@@ -63,8 +63,8 @@ while Running:  # making a loop
     GPIO.output(Motor1B, GPIO.HIGH)
     GPIO.output(Motor1E, GPIO.HIGH)
 
-    GPIO.output(Motor2A, GPIO.LOW)
-    GPIO.output(Motor2B, GPIO.HIGH)
+    GPIO.output(Motor2A, GPIO.HIGH)
+    GPIO.output(Motor2B, GPIO.LOW)
     GPIO.output(Motor2E, GPIO.HIGH)
 
     time.sleep(5)
@@ -77,8 +77,8 @@ while Running:  # making a loop
     GPIO.output(Motor1B, GPIO.LOW)
     GPIO.output(Motor1E, GPIO.HIGH)
 
-    GPIO.output(Motor2A, GPIO.HIGH)
-    GPIO.output(Motor2B, GPIO.LOW)
+    GPIO.output(Motor2A, GPIO.LOW)
+    GPIO.output(Motor2B, GPIO.HIGH)
     GPIO.output(Motor2E, GPIO.HIGH)
 
     time.sleep(5)

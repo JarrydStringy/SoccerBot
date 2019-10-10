@@ -1,46 +1,87 @@
-# Imports
-import cv2
+# from picamera import PiCamera
+# from time import sleep
+#
+# # Raspberry Pi camera manipulation=========================================================================
+# # Exposure off
+# camera = PiCamera
+# camera.exposure_mode = 'off'      # ... locks gains
+#
+# # Auto white balance set value
+# camera.awb_mode = 'sunlight'
+#
+# # Record
+# camera.resolution = (2592, 1944)
+# camera.framerate = 15
+# camera.start_preview()
+# sleep(5)
+# camera.capture('/home/pi/Desktop/max.jpg')
+# camera.stop_preview()
+
+
+
+
+
 import numpy as np
-
-cap = cv2.VideoCapture(0)  # Connect to camera 0 (or the only camera)
-cap.set(3, 320)  # Set the width to 320
-cap.set(4, 240)  # Set the height to 240
-# cap.set(3, 640)
-# cap.set(4, 480)
-ret, frame = cap.read()  # Get a frame from the camera
-
-if ret:  # Check if data was obtained successfully
-    cv2.imshow("CameraImage", frame)  # Display the obtained frame in a window called "CameraImage"
-    cv2.waitKey(0)  # Make the program wait until you press a key before continuing.
-
-    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)  # Convert from BGR to HSV colourspace)
-
-    cv2.imshow("HSV_IMAGE", hsv_frame)
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_HSV2GRAY)
-
-    ret, thresholded_frame = cv2.threshold(frame_blue, 127, 255, cv2.THRESH_BINARY)  # Threshold blue channel
-    plt.imshow(gray, cmap='gray')
-    cv2.imshow("Binary Thresholded Frame", thresholded_frame)  # Display thresholded frame
-    cv2.waitKey(0)  # Exit on keypress
-
-cap.release()  # Release the camera object
-cv2.destroyAllWindows()  # Close all opencv pop-up windows
+import os
+import cv2
 
 
-# ret, dst = cv2.threshold(src, thresh, maxValue, type)
-    # dst 		→ 		The output image
-    # src 		→ 		The input image (this should be a grayscale image)
-    # thresh 	→ 		The threshold value
-    # maxValue 	→ 		A maximum value, used for binary thresholding
-    # type 		→ 		The thresholding method being used (see here for parameter options)
+filename = 'video.avi'
+frames_per_second = 24.0
+res = '720p'
 
-# cv2.imwrite("frame0001.png", frame)		                # Save the frame as frame0001.png
-# lab_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2Lab) 		# Convert from BGR to Lab colourspace
-# b, g, r = cv2.split(frame)		                        # Split the frame into its 3 colour channels
-# b = b*0					                                # Set the blue pixels to zero
-# g = g*0					                                # Set the green pixels to zero
-# frame = cv2.merge((b, g, r))		                        # Merge the channels back into one image
-# frame[:, :, 0] = 0				                        # Set colour channel 0 (blue) to 0
-# sub_frame = frame[200:300, 200:300, 0]		            # Extract blue colour channel of a 100 pixel region
-# sub_frame = sub_frame * 2			                        # Double the pixel blue channel values
-# frame[200:300, 200:300, 0] = sub_frame		            # Replace the region in the original image with our sub frame
+# Set resolution for the video capture
+# Function adapted from https://kirr.co/0l6qmh
+def change_res(cap, width, height):
+    cap.set(3, width)
+    cap.set(4, height)
+
+# Standard Video Dimensions Sizes
+STD_DIMENSIONS =  {
+    "480p": (640, 480),
+    "720p": (1280, 720),
+    "1080p": (1920, 1080),
+    "4k": (3840, 2160),
+}
+
+
+# grab resolution dimensions and set video capture to it.
+def get_dims(cap, res='1080p'):
+    width, height = STD_DIMENSIONS["480p"]
+    if res in STD_DIMENSIONS:
+        width,height = STD_DIMENSIONS[res]
+    ## change the current caputre device
+    ## to the resulting resolution
+    change_res(cap, width, height)
+    return width, height
+
+# Video Encoding, might require additional installs
+# Types of Codes: http://www.fourcc.org/codecs.php
+VIDEO_TYPE = {
+    'avi': cv2.VideoWriter_fourcc(*'XVID'),
+    #'mp4': cv2.VideoWriter_fourcc(*'H264'),
+    'mp4': cv2.VideoWriter_fourcc(*'XVID'),
+}
+
+def get_video_type(filename):
+    filename, ext = os.path.splitext(filename)
+    if ext in VIDEO_TYPE:
+      return  VIDEO_TYPE[ext]
+    return VIDEO_TYPE['avi']
+
+
+
+cap = cv2.VideoCapture(0)
+out = cv2.VideoWriter(filename, get_video_type(filename), 25, get_dims(cap, res))
+
+while True:
+    ret, frame = cap.read()
+    out.write(frame)
+    cv2.imshow('frame',frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+
+cap.release()
+out.release()
+cv2.destroyAllWindows()
