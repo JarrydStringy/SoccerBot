@@ -14,29 +14,29 @@ import time
 
 # define ranges of spectrum in HSV[] for each object======================================================
 # Ball=============================================
-lower_ball = np.array([0, 0, 140])
-upper_ball = np.array([16, 250, 255])
+lower_ball = np.array([0, 0, 0])
+upper_ball = np.array([13, 255, 255])
 # Blue goal========================================
-lower_blue = np.array([115, 59, 34])
-upper_blue = np.array([152, 161, 136])
+lower_blue = np.array([49, 50, 0])
+upper_blue = np.array([100, 255, 125])
 # Yellow goal======================================
-lower_yellow = np.array([17, 178, 73])
-upper_yellow = np.array([30, 255, 193])
+lower_yellow = np.array([13, 100, 0])
+upper_yellow = np.array([20, 255, 255])
 # Obstacles========================================
-lower_obstacle = np.array([249, 53, 0])
-upper_obstacle = np.array([50, 160, 82])
+lower_obstacle = np.array([0, 0, 0])
+upper_obstacle = np.array([40, 255, 80])
 # Walls============================================
-lower_wall = np.array([249, 53, 0])
-upper_wall = np.array([50, 160, 82])
+lower_wall = np.array([0, 0, 0])
+upper_wall = np.array([255, 60, 255])
 
 # Constants
 BALL_WIDTH = 0.043  # m
 OBSTACLE_WIDTH = 0.18  # m
-YELLOW_GOAL_WIDTH = 0  # m
-BLUE_GOAL_WIDTH = 0  # m
+YELLOW_GOAL_WIDTH = 0.5  # m
+BLUE_GOAL_WIDTH = 0.5  # m
 WALL_WIDTH = 0  # m
 FOCAL_LENGTH = 123.423  # m
-DEG_PER_PX = 0.01927    # Calculated constant
+DEG_PER_PX = 0.01927  # Calculated constant
 
 # Begin video capture
 cap = cv2.VideoCapture(0)  # Connect to camera 0 (or the only camera)
@@ -66,10 +66,10 @@ def BoxObject(marker):
 
 def PrintReadings(dist, angle, yd, yb, name):
     # Print readings on frame
-    cv2.putText(frame, "D%s: %.2fm" % (name, dist),
+    cv2.putText(frame, "D %s: %.2fm" % (name, dist),
                 (frame.shape[1] - 110, frame.shape[0] - yd), cv2.FONT_HERSHEY_SIMPLEX,
                 0.45, (0, 255, 0), 2)
-    cv2.putText(frame, "B%s: %.2fdeg" % (name, angle),
+    cv2.putText(frame, "B %s: %.2fdeg" % (name, angle),
                 (frame.shape[1] - 110, frame.shape[0] - yb), cv2.FONT_HERSHEY_SIMPLEX,
                 0.45, (0, 255, 0), 2)
 
@@ -105,7 +105,7 @@ def ObstacleReadings(image):
         # Print
         print("Distance to Obstacle: " + str(dist_obstacle))
         print("Angle to Obstacle: " + str(angle_obstacle))
-        PrintReadings(dist_obstacle, angle_obstacle, 30, 10, "obs")
+        PrintReadings(dist_obstacle, angle_obstacle, 30, 10, "o")
 
 
 def BlueGoalReadings(image):
@@ -165,7 +165,7 @@ while True:
     startTime = time.time()
 
     ret, frame = cap.read()  # capture each frame
-    # frame = cv2.imread('test.png')
+    frame = cv2.imread('test_colour3.png')
     frame = cv2.flip(frame, 0)  # Flip image
     blur = cv2.GaussianBlur(frame, (5, 5), 0)  # blur frames with gaussian 5x5 kernel and determined std dev
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)  # Convert BGR to HSV
@@ -180,7 +180,7 @@ while True:
     blue_mask = cv2.inRange(hsv, lower_blue, upper_blue)
     blue_mask = cv2.erode(blue_mask, None, iterations=2)
 
-    yellow_mask = cv2.inRange(hsv, lower_obstacle, upper_yellow)
+    yellow_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
     yellow_mask = cv2.erode(yellow_mask, None, iterations=2)
 
     wall_mask = cv2.inRange(hsv, lower_wall, upper_wall)
@@ -222,11 +222,8 @@ while True:
     cv2.imshow('frame', frame)
     # cv2.imshow('blur', blur)
     # cv2.imshow('individual ball mask', ball_mask)
-    # cv2.imshow('individual obstacle mask', obstacle_mask)
-    # cv2.imshow('masked ball', masked_ball)
-    # cv2.imshow('masked obstacle', masked_obstacle)
-    # cv2.imshow('edged ball', edged_ball)
-    # cv2.imshow('edged obstacle', edged_obstacle)
+    cv2.imshow('masked ball', masked_wall)
+    # cv2.imshow('edged ball', edged_obstacle)
 
     k = cv2.waitKey(5) & 0xFF
     # k == 27 is for Esc key
