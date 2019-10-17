@@ -89,6 +89,8 @@ def BallReadings(image):
         # print("Distance to Ball: " + str(dist_ball))
         # print("Angle to Ball: " + str(angle_ball))
         PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
+        ballRB = [dist_ball, angle_ball]
+        return ballRB
 
 
 def ObstacleReadings(image):
@@ -163,6 +165,8 @@ def WallReadings(image):
         # print("Distance to Wall: " + str(dist_wall))
         # print("Angle to Wall: " + str(angle_wall))
         PrintReadings(dist_wall, angle_wall, 190, 170, "wall")
+        wallRB = [dist_wall, angle_wall]
+        return wallRB
 
 
 while True:
@@ -172,7 +176,8 @@ while True:
 
     ret, frame = cap.read()  # capture each frame
     # frame = cv2.imread('distTest60.png')
-    frame = cv2.flip(frame, 0)  # Flip image
+    frame = cv2.flip(frame, 0)  # Flip image vertically
+    frame = cv2.flip(frame, 1)  # Flip image horizontally
     blur = cv2.GaussianBlur(frame, (5, 5), 0)  # blur frames with gaussian 5x5 kernel and determined std dev
     hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)  # Convert BGR to HSV
 
