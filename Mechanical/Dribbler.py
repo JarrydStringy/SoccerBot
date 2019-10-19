@@ -1,9 +1,8 @@
 import RPi.GPIO as GPIO
 
-GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-Motor1A = 25
-Motor1B = 8
+Motor1A = 19
+Motor1B = 26
 
 GPIO.setup(Motor1A,GPIO.OUT)  # All pins as Outputs
 GPIO.setup(Motor1B,GPIO.OUT)
