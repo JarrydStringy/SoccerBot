@@ -36,7 +36,7 @@ YELLOW_GOAL_WIDTH = 0.75  # m
 BLUE_GOAL_WIDTH = 0.75  # m
 WALL_WIDTH = 0  # m
 FOCAL_LENGTH = 123.423  # m
-DEG_PER_PX = 0.019  # Calculated constant
+DEG_PER_PX = 0.01927  # Calculated constant
 
 # Begin video capture
 cap = cv2.VideoCapture(0)  # Connect to camera 0 (or the only camera)
@@ -90,37 +90,10 @@ def BallReadings(image):
         # print("Angle to Ball: " + str(angle_ball))
         PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
         ballRB = [dist_ball, angle_ball]
-    return ballRB
+        return ballRB
 
 
 def ObstacleReadings(image):
-    # # find the contours in the edged image and keep the largest one
-    # contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    # contours = imutils.grab_contours(contours)
-    # contours = sorted(contours, key=cv2.contourArea)
-    # c = [0]
-    # marker = []
-    # dist_obstacle = []
-    # angle_obstacle = []
-    # obstacleRB = []
-    # if len(contours) > 0:
-    #     for i in range(len(contours)):
-    #         if cv2.contourArea(contours[i]) > 200:
-    #             print(cv2.contourArea(contours[i]))
-    #             print("test")
-    #             c.append(contours)
-    #             # marker.append(cv2.minAreaRect(c[i]))
-    #             BoxObject(marker[i])
-    #             # Find the distances and bearings
-    #             dist_obstacle.append(DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0]))
-    #             angle_obstacle.append(BearingToCamera(marker[1][0], DEG_PER_PX))
-    #             # Print
-    #             # print("Distance to Obstacle: " + str(dist_obstacle))
-    #             # print("Angle to Obstacle: " + str(angle_obstacle))
-    #             PrintReadings(dist_obstacle[i], angle_obstacle[i], 30, 10, "obs")
-    #             obstacleRB.append(dist_obstacle[i], angle_obstacle[i])
-    # return obstacleRB
-    # print()
     # find the contours in the edged image and keep the largest one
     contours = cv2.findContours(edged_obstacle.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = imutils.grab_contours(contours)
@@ -136,6 +109,7 @@ def ObstacleReadings(image):
         # print("Angle to Ball: " + str(angle_ball))
         PrintReadings(dist_obstacle, angle_obstacle, 70, 50, "obstacle")
         obstacleRB = [dist_obstacle, angle_obstacle]
+        return obstacleRB
 
 
 def BlueGoalReadings(image):
@@ -201,7 +175,7 @@ while True:
     startTime = time.time()
 
     ret, frame = cap.read()  # capture each frame
-    # frame = cv2.imread('test_colour1.png')
+    # frame = cv2.imread('photo/1.jpg')
     frame = cv2.flip(frame, 0)  # Flip image vertically
     frame = cv2.flip(frame, 1)  # Flip image horizontally
     blur = cv2.GaussianBlur(frame, (5, 5), 0)  # blur frames with gaussian 5x5 kernel and determined std dev
@@ -238,26 +212,11 @@ while True:
     edged_wall = cv2.Canny(masked_wall, 35, 125)
 
     # Return distance and bearing to all of the objects=============================================
-    # find the contours in the edged image and keep the largest one
-    contours = cv2.findContours(edged_ball.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
-        c = max(contours, key=cv2.contourArea)
-        marker = cv2.minAreaRect(c)
-        BoxObject(marker)
-        # Find the distances and bearings
-        dist_ball = DistanceToCamera(BALL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_ball = BearingToCamera(marker[1][0], DEG_PER_PX)
-        # Print
-        # print("Distance to Ball: " + str(dist_ball))
-        # print("Angle to Ball: " + str(angle_ball))
-        PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
-        ballRB = [dist_ball, angle_ball]
-
-    ObstacleReadings(edged_obstacle)
-    YellowGoalReadings(edged_yellow)
-    BlueGoalReadings(edged_blue)
-    WallReadings(edged_wall)
+    BallReadings(edged_ball)
+    # ObstacleReadings(edged_obstacle)
+    # YellowGoalReadings(edged_yellow)
+    # BlueGoalReadings(edged_blue)
+    # WallReadings(edged_wall)
 
     # Calculate FPS================================================================================
     endTime = time.time()
@@ -273,11 +232,9 @@ while True:
     # Display steps of masking images as video======================================================
     cv2.imshow('frame', frame)
     # cv2.imshow('blur', blur)
-    cv2.imshow('individual ball mask', obstacle_mask)
-    cv2.imshow('masked ball', masked_obstacle)
-    cv2.imshow('edged ball', edged_obstacle)
-
-    # ballRB = BallReadings(frame)
+    cv2.imshow('individual ball mask', ball_mask)
+    cv2.imshow('masked ball', masked_ball)
+    cv2.imshow('edged ball', edged_ball)
 
     k = cv2.waitKey(5) & 0xFF
     # k == 27 is for Esc key
