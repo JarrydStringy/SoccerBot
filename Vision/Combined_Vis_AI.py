@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import imutils
 import time
+import math
 
 # Raspberry Pi camera manipulation=========================================================================
 # Exposure off
@@ -36,12 +37,50 @@ YELLOW_GOAL_WIDTH = 0.75  # m
 BLUE_GOAL_WIDTH = 0.75  # m
 WALL_WIDTH = 0  # m
 FOCAL_LENGTH = 123.423  # m
-DEG_PER_PX = 0.019  # Calculated constant
+DEG_PER_PX = 0.01927  # Calculated constant
+in_view = False
+ball_behind_obstacle = False
 
 # Begin video capture
 cap = cv2.VideoCapture(0)  # Connect to camera 0 (or the only camera)
 cap.set(3, 320)  # Set the width to 320
 cap.set(4, 240)  # Set the height to 240
+
+
+def gotoball(range, bearing):
+    # ball_connected = soccerBotSim.BallInDribbler()
+    if ballRB[1] < 0.05 and ballRB[1] > -0.05:
+        print("Drive forward")
+        # soccerBotSim.SetTargetVelocities(0.1, 0, 0)
+    elif ballRB[1] > 0.05 and ballRB[0] > 0.2:
+        print("Drive left")
+        # soccerBotSim.SetTargetVelocities(0.1, 0, 0.2)
+    elif ballRB[1] < -0.05 and ballRB[0] > 0.2:
+        print("Drive right")
+        # soccerBotSim.SetTargetVelocities(0.1, 0, -0.2)
+    # if range < 0.1:
+    #     while BallInDribbler():
+    #         print("")
+    #         # soccerBotSim.SetTargetVelocities(0.1, 0, 0)
+    #         # ball_connected = soccerBotSim.BallInDribbler()
+    #         # soccerBotSim.UpdateObjectPositions()
+
+
+def goToGoal(range, bearing):
+    if bearing < 0.05 and bearing > -0.05:
+        print("Forward goal")
+        # soccerBotSim.SetTargetVelocities(0.1, 0, 0)
+    elif bearing > 0.05 and range > 0.2:
+        print("")
+        # soccerBotSim.SetTargetVelocities(0.1, 0, 0.2)
+    elif bearing < -0.05 and range > 0.2:
+        print("")
+        # soccerBotSim.SetTargetVelocities(0.1, 0, -0.2)
+
+    if range < 0.6:
+        print("")
+        # soccerBotSim.SetTargetVelocities(0, 0, 0)
+        # soccerBotSim.KickBall(0.5)
 
 
 def DistanceToCamera(knownWidth, focalLength, perWidth):
@@ -74,125 +113,9 @@ def PrintReadings(dist, angle, yd, yb, name):
                 0.45, (0, 255, 0), 2)
 
 
-def BallReadings(image):
-    # find the contours in the edged image and keep the largest one
-    contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
-        c = max(contours, key=cv2.contourArea)
-        marker = cv2.minAreaRect(c)
-        BoxObject(marker)
-        # Find the distances and bearings
-        dist_ball = DistanceToCamera(BALL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_ball = BearingToCamera(marker[1][0], DEG_PER_PX)
-        # Print
-        # print("Distance to Ball: " + str(dist_ball))
-        # print("Angle to Ball: " + str(angle_ball))
-        PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
-        ballRB = [dist_ball, angle_ball]
-    return ballRB
-
-
-def ObstacleReadings(image):
-    # # find the contours in the edged image and keep the largest one
-    # contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    # contours = imutils.grab_contours(contours)
-    # contours = sorted(contours, key=cv2.contourArea)
-    # c = [0]
-    # marker = []
-    # dist_obstacle = []
-    # angle_obstacle = []
-    # obstacleRB = []
-    # if len(contours) > 0:
-    #     for i in range(len(contours)):
-    #         if cv2.contourArea(contours[i]) > 200:
-    #             print(cv2.contourArea(contours[i]))
-    #             print("test")
-    #             c.append(contours)
-    #             # marker.append(cv2.minAreaRect(c[i]))
-    #             BoxObject(marker[i])
-    #             # Find the distances and bearings
-    #             dist_obstacle.append(DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0]))
-    #             angle_obstacle.append(BearingToCamera(marker[1][0], DEG_PER_PX))
-    #             # Print
-    #             # print("Distance to Obstacle: " + str(dist_obstacle))
-    #             # print("Angle to Obstacle: " + str(angle_obstacle))
-    #             PrintReadings(dist_obstacle[i], angle_obstacle[i], 30, 10, "obs")
-    #             obstacleRB.append(dist_obstacle[i], angle_obstacle[i])
-    # return obstacleRB
-    # print()
-    # find the contours in the edged image and keep the largest one
-    contours = cv2.findContours(edged_obstacle.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
-        c = max(contours, key=cv2.contourArea)
-        marker = cv2.minAreaRect(c)
-        BoxObject(marker)
-        # Find the distances and bearings
-        dist_obstacle = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_obstacle = BearingToCamera(marker[1][0], DEG_PER_PX)
-        # Print
-        # print("Distance to Ball: " + str(dist_ball))
-        # print("Angle to Ball: " + str(angle_ball))
-        PrintReadings(dist_obstacle, angle_obstacle, 70, 50, "obstacle")
-        obstacleRB = [dist_obstacle, angle_obstacle]
-
-
-def BlueGoalReadings(image):
-    # find the contours in the edged image and keep the largest one
-    contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
-        c = max(contours, key=cv2.contourArea)
-        marker = cv2.minAreaRect(c)
-        BoxObject(marker)
-        # Find the distances and bearings
-        dist_blue = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_blue = BearingToCamera(marker[1][0], DEG_PER_PX)
-        # Print
-        # print("Distance to Blue Goal: " + str(dist_blue))
-        # print("Angle to Blue Goal: " + str(angle_blue))
-        PrintReadings(dist_blue, angle_blue, 150, 130, "blue")
-        blueRB = [dist_blue, angle_blue]
-        return blueRB
-
-
-def YellowGoalReadings(image):
-    # find the contours in the edged image and keep the largest one
-    contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
-        c = max(contours, key=cv2.contourArea)
-        marker = cv2.minAreaRect(c)
-        BoxObject(marker)
-        # Find the distances and bearings
-        dist_yellow = DistanceToCamera(YELLOW_GOAL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_yellow = BearingToCamera(marker[1][0], DEG_PER_PX)
-        # Print
-        # print("Distance to Obstacle: " + str(dist_yellow))
-        # print("Angle to Obstacle: " + str(angle_yellow))
-        PrintReadings(dist_yellow, angle_yellow, 110, 90, "ylw")
-        yellowRB = [dist_yellow, angle_yellow]
-        return yellowRB
-
-
-def WallReadings(image):
-    # find the contours in the edged image and keep the largest one
-    contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
-        c = max(contours, key=cv2.contourArea)
-        marker = cv2.minAreaRect(c)
-        BoxObject(marker)
-        # Find the distances and bearings
-        dist_wall = DistanceToCamera(WALL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_wall = BearingToCamera(marker[1][0], DEG_PER_PX)
-        # Print
-        # print("Distance to Wall: " + str(dist_wall))
-        # print("Angle to Wall: " + str(angle_wall))
-        PrintReadings(dist_wall, angle_wall, 190, 170, "wall")
-        wallRB = [dist_wall, angle_wall]
-        return wallRB
+def BallInDribbler():
+    ball_connected = False
+    return ball_connected
 
 
 while True:
@@ -254,10 +177,123 @@ while True:
         PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
         ballRB = [dist_ball, angle_ball]
 
-    ObstacleReadings(edged_obstacle)
-    YellowGoalReadings(edged_yellow)
-    BlueGoalReadings(edged_blue)
-    WallReadings(edged_wall)
+    # find the contours in the edged image and keep the largest one
+    contours = cv2.findContours(edged_obstacle.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = imutils.grab_contours(contours)
+    if len(contours) > 0:
+        c = max(contours, key=cv2.contourArea)
+        marker = cv2.minAreaRect(c)
+        BoxObject(marker)
+        # Find the distances and bearings
+        dist_obstacle = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
+        angle_obstacle = BearingToCamera(marker[1][0], DEG_PER_PX)
+        # Print
+        # print("Distance to Ball: " + str(dist_ball))
+        # print("Angle to Ball: " + str(angle_ball))
+        PrintReadings(dist_obstacle, angle_obstacle, 70, 50, "obstacle")
+        obstacleRB = [dist_obstacle, angle_obstacle]
+
+    # find the contours in the edged image and keep the largest one
+    contours = cv2.findContours(edged_blue.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = imutils.grab_contours(contours)
+    if len(contours) > 0:
+        c = max(contours, key=cv2.contourArea)
+        marker = cv2.minAreaRect(c)
+        BoxObject(marker)
+        # Find the distances and bearings
+        dist_blue = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
+        angle_blue = BearingToCamera(marker[1][0], DEG_PER_PX)
+        # Print
+        # print("Distance to Blue Goal: " + str(dist_blue))
+        # print("Angle to Blue Goal: " + str(angle_blue))
+        PrintReadings(dist_blue, angle_blue, 150, 130, "blue")
+        blueRB = [dist_blue, angle_blue]
+
+    # find the contours in the edged image and keep the largest one
+    contours = cv2.findContours(edged_yellow.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = imutils.grab_contours(contours)
+    if len(contours) > 0:
+        c = max(contours, key=cv2.contourArea)
+        marker = cv2.minAreaRect(c)
+        BoxObject(marker)
+        # Find the distances and bearings
+        dist_yellow = DistanceToCamera(YELLOW_GOAL_WIDTH, FOCAL_LENGTH, marker[1][0])
+        angle_yellow = BearingToCamera(marker[1][0], DEG_PER_PX)
+        # Print
+        # print("Distance to Obstacle: " + str(dist_yellow))
+        # print("Angle to Obstacle: " + str(angle_yellow))
+        PrintReadings(dist_yellow, angle_yellow, 110, 90, "ylw")
+        yellowRB = [dist_yellow, angle_yellow]
+
+    # find the contours in the edged image and keep the largest one
+    contours = cv2.findContours(edged_wall.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours = imutils.grab_contours(contours)
+    if len(contours) > 0:
+        c = max(contours, key=cv2.contourArea)
+        marker = cv2.minAreaRect(c)
+        BoxObject(marker)
+        # Find the distances and bearings
+        dist_wall = DistanceToCamera(WALL_WIDTH, FOCAL_LENGTH, marker[1][0])
+        angle_wall = BearingToCamera(marker[1][0], DEG_PER_PX)
+        # Print
+        # print("Distance to Wall: " + str(dist_wall))
+        # print("Angle to Wall: " + str(angle_wall))
+        PrintReadings(dist_wall, angle_wall, 190, 170, "wall")
+        wallRB = [dist_wall, angle_wall]
+
+    # Display steps of masking images as video======================================================
+    cv2.imshow('frame', frame)
+    # # cv2.imshow('blur', blur)
+    # cv2.imshow('individual ball mask', obstacle_mask)
+    # cv2.imshow('masked ball', masked_obstacle)
+    # cv2.imshow('edged ball', edged_obstacle)
+
+    # =======================================================================================================
+    # Get Detected Objects
+
+    blueGoal = True
+    print("Starting AI")
+    # Check to see if the ball is within the camera's FOV
+    if ballRB != None:
+        print("Ball range and bearing: %0.4f, %0.4f" % (dist_ball, angle_ball))
+        gotoball(dist_ball, angle_ball)
+    elif ball_behind_obstacle == False and BallInDribbler() == False:
+        print("Search")
+        # soccerBotSim.SetTargetVelocities(0.001, 0, 0.8)
+        if (blueRB != None or yellowRB != None) and in_view == False and rotation_count < 3:
+            rotation_count += 1
+            in_view = True
+        elif blueRB == None and yellowRB == None and in_view == True and rotation_count < 3:
+            in_view = False
+        elif rotation_count == 3:
+            ball_behind_obstacle = True
+    elif ball_behind_obstacle == True:
+        # soccerBotSim.SetTargetVelocities(0, 0, 0)
+        print("Ball obstructed")
+
+    if BallInDribbler() and blueGoal == True:
+        rotation_count = 0
+        if blueRB != None:
+            goToGoal(blueRB[0], blueRB[1])
+        else:
+            print("Searching for blue goal")
+            # soccerBotSim.SetTargetVelocities(0.001, 0, 1)
+    elif BallInDribbler() and blueGoal == False:
+        rotation_count = 0
+        if yellowRB != None:
+            goToGoal(yellowRB[0], yellowRB[1])
+        else:
+            print("Searching for yellow goal")
+            # soccerBotSim.SetTargetVelocities(0.001, 0, 1)
+
+        # Check to see if any obstacles are within the camera's FOV
+    if obstacleRB != None:
+        print("")
+        # loop through each obstacle detected using Pythonian way
+        # for obstacle in obstacleRB:
+        #     obstacleRange = obstacle[0]
+        #     obstacleBearing = obstacle[1]
+    # =======================================================================================================
 
     # Calculate FPS================================================================================
     endTime = time.time()
@@ -269,15 +305,6 @@ while True:
     cv2.putText(frame, "FPS: %.2f" % fps,
                 (frame.shape[1] - 320, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (0, 255, 0), 2)
-
-    # Display steps of masking images as video======================================================
-    cv2.imshow('frame', frame)
-    # cv2.imshow('blur', blur)
-    cv2.imshow('individual ball mask', obstacle_mask)
-    cv2.imshow('masked ball', masked_obstacle)
-    cv2.imshow('edged ball', edged_obstacle)
-
-    # ballRB = BallReadings(frame)
 
     k = cv2.waitKey(5) & 0xFF
     # k == 27 is for Esc key

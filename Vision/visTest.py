@@ -78,7 +78,7 @@ def BallReadings(image):
     # find the contours in the edged image and keep the largest one
     contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = imutils.grab_contours(contours)
-    if True:
+    if len(contours) > 0:
         c = max(contours, key=cv2.contourArea)
         marker = cv2.minAreaRect(c)
         BoxObject(marker)
@@ -89,9 +89,13 @@ def BallReadings(image):
         # print("Distance to Ball: " + str(dist_ball))
         # print("Angle to Ball: " + str(angle_ball))
         PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
-        ballRB = [dist_ball, angle_ball]
-        return ballRB
+        obstacleRB = [dist_ball, angle_ball]
+        return obstacleRB
 
+
+def Test():
+    x = 100
+    return x
 
 def ObstacleReadings(image):
     # find the contours in the edged image and keep the largest one
@@ -167,13 +171,20 @@ def WallReadings(image):
         PrintReadings(dist_wall, angle_wall, 190, 170, "wall")
 
 
+def Display(image):
+    cv2.imshow('frame', image)
+    # cv2.imshow('blur', blur)
+    # cv2.imshow('individual ball mask', ball_mask)
+    # cv2.imshow('masked ball', masked_wall)
+    # cv2.imshow('edged ball', edged_obstaclse)
+
 
 # Filter each image to find required objects====================================================
 # Record starting time for FPS
 startTime = time.time()
 
 ret, frame = cap.read()  # capture each frame
-# frame = cv2.imread('distTest60.png')
+# frame = cv2.imread('test_colour1.png')
 frame = cv2.flip(frame, 0)  # Flip image vertically
 frame = cv2.flip(frame, 1)  # Flip image horizontally
 blur = cv2.GaussianBlur(frame, (5, 5), 0)  # blur frames with gaussian 5x5 kernel and determined std dev
@@ -228,11 +239,7 @@ cv2.putText(frame, "FPS: %.2f" % fps,
             0.5, (0, 255, 0), 2)
 
 # Display steps of masking images as video======================================================
-cv2.imshow('frame', frame)
-# cv2.imshow('blur', blur)
-# cv2.imshow('individual ball mask', ball_mask)
-# cv2.imshow('masked ball', masked_wall)
-# cv2.imshow('edged ball', edged_obstaclse)
+Display(frame)
 
 cap.release()  # Release the camera object
 cv2.destroyAllWindows()  # stops program
