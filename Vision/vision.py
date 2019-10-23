@@ -76,6 +76,13 @@ def PrintReadings(dist, angle, yd, yb, name):
                 0.45, (0, 255, 0), 2)
 
 
+def InDribbler(distance):
+    inDribbler = False
+    if distance < 0.025 and distance != 0:
+        inDribbler = True
+    return inDribbler
+
+
 def BallReadings(image):
     # find the contours in the edged image and keep the largest one
     contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
@@ -88,9 +95,11 @@ def BallReadings(image):
         dist_ball = DistanceToCamera(BALL_WIDTH, FOCAL_LENGTH, marker[1][0])
         angle_ball = BearingToCamera(marker[0][0])
         # Print
-        # print("Distance to Ball: " + str(dist_ball))
-        # print("Angle to Ball: " + str(angle_ball))
+        print("Distance to Ball: " + str(dist_ball))
+        print("Angle to Ball: " + str(angle_ball))
         PrintReadings(dist_ball, angle_ball, 70, 50, "ball")
+        inDribbler = InDribbler(dist_ball)
+        print(inDribbler)
         ballRB = [dist_ball, angle_ball]
         return ballRB
 
@@ -107,8 +116,8 @@ def ObstacleReadings(image):
         dist_obstacle = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
         angle_obstacle = BearingToCamera(marker[0][0])
         # Print
-        # print("Distance to Ball: " + str(dist_ball))
-        # print("Angle to Ball: " + str(angle_ball))
+        print("Distance to Ball: " + str(dist_obstacle))
+        print("Angle to Ball: " + str(angle_obstacle))
         PrintReadings(dist_obstacle, angle_obstacle, 30, 10, "ob")
         obstacleRB = [dist_obstacle, angle_obstacle]
         return obstacleRB
@@ -126,8 +135,8 @@ def BlueGoalReadings(image):
         dist_blue = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
         angle_blue = BearingToCamera(marker[0][0])
         # Print
-        # print("Distance to Blue Goal: " + str(dist_blue))
-        # print("Angle to Blue Goal: " + str(angle_blue))
+        print("Distance to Blue Goal: " + str(dist_blue))
+        print("Angle to Blue Goal: " + str(angle_blue))
         PrintReadings(dist_blue, angle_blue, 150, 130, "blue")
         blueRB = [dist_blue, angle_blue]
         return blueRB
@@ -145,8 +154,8 @@ def YellowGoalReadings(image):
         dist_yellow = DistanceToCamera(YELLOW_GOAL_WIDTH, FOCAL_LENGTH, marker[1][0])
         angle_yellow = BearingToCamera(marker[0][0])
         # Print
-        # print("Distance to Obstacle: " + str(dist_yellow))
-        # print("Angle to Obstacle: " + str(angle_yellow))
+        print("Distance to Obstacle: " + str(dist_yellow))
+        print("Angle to Obstacle: " + str(angle_yellow))
         PrintReadings(dist_yellow, angle_yellow, 110, 90, "ylw")
         yellowRB = [dist_yellow, angle_yellow]
         return yellowRB
@@ -164,8 +173,8 @@ def WallReadings(image):
         dist_wall = DistanceToCamera(WALL_WIDTH, FOCAL_LENGTH, marker[1][0])
         angle_wall = BearingToCamera(marker[0][0])
         # Print
-        # print("Distance to Wall: " + str(dist_wall))
-        # print("Angle to Wall: " + str(angle_wall))
+        print("Distance to Wall: " + str(dist_wall))
+        print("Angle to Wall: " + str(angle_wall))
         PrintReadings(dist_wall, angle_wall, 190, 170, "wall")
         wallRB = [dist_wall, angle_wall]
         return wallRB
