@@ -14,14 +14,16 @@ import time
 
 # define ranges of spectrum in HSV[] for each object======================================================
 # Ball=============================================
-lower_ball = np.array([0, 0, 0])
-upper_ball = np.array([13, 255, 255])
+# lower_ball = np.array([0, 0, 0])          #Easy to see ball in front of body
+# upper_ball = np.array([13, 255, 255])
+lower_ball = np.array([0, 122, 91])
+upper_ball = np.array([255, 250, 255])
 # Blue goal========================================
-lower_blue = np.array([49, 50, 0])
-upper_blue = np.array([100, 255, 125])
+lower_blue = np.array([100, 0, 100])
+upper_blue = np.array([150, 255, 200])
 # Yellow goal======================================
 lower_yellow = np.array([13, 100, 0])
-upper_yellow = np.array([20, 255, 255])
+upper_yellow = np.array([50, 255, 255])
 # Obstacles========================================
 lower_obstacle = np.array([0, 0, 0])
 upper_obstacle = np.array([40, 255, 80])
@@ -52,9 +54,9 @@ def DistanceToCamera(knownWidth, focalLength, perWidth):
         return 0
 
 
-def BearingToCamera(position, degreePixelRatio):
+def BearingToCamera(position):
     # compute and return the distance from the maker to the camera
-    return position * degreePixelRatio
+    return position * DEG_PER_PX * 10 - 30
 
 
 def BoxObject(marker):
@@ -78,13 +80,13 @@ def BallReadings(image):
     # find the contours in the edged image and keep the largest one
     contours = cv2.findContours(image.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     contours = imutils.grab_contours(contours)
-    if len(contours) > 0:
+    if len(contours) > 1:
         c = max(contours, key=cv2.contourArea)
         marker = cv2.minAreaRect(c)
         BoxObject(marker)
         # Find the distances and bearings
         dist_ball = DistanceToCamera(BALL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_ball = BearingToCamera(marker[1][0], DEG_PER_PX)
+        angle_ball = BearingToCamera(marker[0][0])
         # Print
         # print("Distance to Ball: " + str(dist_ball))
         # print("Angle to Ball: " + str(angle_ball))
@@ -103,11 +105,11 @@ def ObstacleReadings(image):
         BoxObject(marker)
         # Find the distances and bearings
         dist_obstacle = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_obstacle = BearingToCamera(marker[1][0], DEG_PER_PX)
+        angle_obstacle = BearingToCamera(marker[0][0])
         # Print
         # print("Distance to Ball: " + str(dist_ball))
         # print("Angle to Ball: " + str(angle_ball))
-        PrintReadings(dist_obstacle, angle_obstacle, 70, 50, "obstacle")
+        PrintReadings(dist_obstacle, angle_obstacle, 30, 10, "ob")
         obstacleRB = [dist_obstacle, angle_obstacle]
         return obstacleRB
 
@@ -122,7 +124,7 @@ def BlueGoalReadings(image):
         BoxObject(marker)
         # Find the distances and bearings
         dist_blue = DistanceToCamera(OBSTACLE_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_blue = BearingToCamera(marker[1][0], DEG_PER_PX)
+        angle_blue = BearingToCamera(marker[0][0])
         # Print
         # print("Distance to Blue Goal: " + str(dist_blue))
         # print("Angle to Blue Goal: " + str(angle_blue))
@@ -141,7 +143,7 @@ def YellowGoalReadings(image):
         BoxObject(marker)
         # Find the distances and bearings
         dist_yellow = DistanceToCamera(YELLOW_GOAL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_yellow = BearingToCamera(marker[1][0], DEG_PER_PX)
+        angle_yellow = BearingToCamera(marker[0][0])
         # Print
         # print("Distance to Obstacle: " + str(dist_yellow))
         # print("Angle to Obstacle: " + str(angle_yellow))
@@ -160,7 +162,7 @@ def WallReadings(image):
         BoxObject(marker)
         # Find the distances and bearings
         dist_wall = DistanceToCamera(WALL_WIDTH, FOCAL_LENGTH, marker[1][0])
-        angle_wall = BearingToCamera(marker[1][0], DEG_PER_PX)
+        angle_wall = BearingToCamera(marker[0][0])
         # Print
         # print("Distance to Wall: " + str(dist_wall))
         # print("Angle to Wall: " + str(angle_wall))
@@ -175,7 +177,7 @@ while True:
     startTime = time.time()
 
     ret, frame = cap.read()  # capture each frame
-    # frame = cv2.imread('photo/1.jpg')
+    # frame = cv2.imread('photo/image2.jpg')
     frame = cv2.flip(frame, 0)  # Flip image vertically
     frame = cv2.flip(frame, 1)  # Flip image horizontally
     blur = cv2.GaussianBlur(frame, (5, 5), 0)  # blur frames with gaussian 5x5 kernel and determined std dev
@@ -213,10 +215,10 @@ while True:
 
     # Return distance and bearing to all of the objects=============================================
     BallReadings(edged_ball)
-    # ObstacleReadings(edged_obstacle)
-    # YellowGoalReadings(edged_yellow)
-    # BlueGoalReadings(edged_blue)
-    # WallReadings(edged_wall)
+    ObstacleReadings(edged_obstacle)
+    YellowGoalReadings(edged_yellow)
+    BlueGoalReadings(edged_blue)
+    WallReadings(edged_wall)
 
     # Calculate FPS================================================================================
     endTime = time.time()
@@ -232,9 +234,9 @@ while True:
     # Display steps of masking images as video======================================================
     cv2.imshow('frame', frame)
     # cv2.imshow('blur', blur)
-    cv2.imshow('individual ball mask', ball_mask)
-    cv2.imshow('masked ball', masked_ball)
-    cv2.imshow('edged ball', edged_ball)
+    # cv2.imshow('individual ball mask', blue_mask)
+    # cv2.imshow('masked ball', masked_blue)
+    # cv2.imshow('edged ball', edged_yellow)
 
     k = cv2.waitKey(5) & 0xFF
     # k == 27 is for Esc key
